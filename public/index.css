@@ -33,3 +33,7 @@ nav ul li.active {
 .tab.active {
     background-color: cornsilk;
 }
+
+.auth {
+    padding-top: 1rem;
+}
