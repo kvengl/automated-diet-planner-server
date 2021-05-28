@@ -1,0 +1,35 @@
+.nav-wrapper {
+    padding: 0 2rem;
+}
+
+nav .brand-logo {
+    position: absolute;
+    color: #fff;
+    display: inline-block;
+    font-size: 1.6rem;
+    padding: 0;
+}
+
+nav {
+    background-color: #00003C;
+}
+
+.tabs.tabs-transparent {
+    background-color: #fff;
+}
+
+nav ul li.active {
+    background-color: #fff;
+}
+
+.tabs .tab a {
+    color: #000 !important;
+}
+
+.tabs .tab a:focus, .tabs .tab a:focus.active {
+    background-color: #fff;
+}
+
+.tab.active {
+    background-color: cornsilk;
+}

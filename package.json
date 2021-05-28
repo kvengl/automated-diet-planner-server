@@ -1,0 +1,29 @@
+{
+  "name": "automated-diet-planner-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kvengl/automated-diet-planner-server.git"
+  },
+  "author": "Pavel Filippov <filippov7799@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kvengl/automated-diet-planner-server/issues"
+  },
+  "homepage": "https://github.com/kvengl/automated-diet-planner-server#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-handlebars": "^5.3.0",
+    "mongoose": "^5.12.7"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}
