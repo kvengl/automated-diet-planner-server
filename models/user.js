@@ -11,10 +11,14 @@ const userSchema = new Schema({
       type: String,
       required: true
     },
+    password: {
+      type: String,
+      required: true
+    },
     role: {
       type: String,
       required: true,
-      default: 'пользователь'
+      default: 'user'
     },
     birthday: {
       type: Date,
@@ -22,48 +26,11 @@ const userSchema = new Schema({
     },
   },
   anthropometry: {
-		sex: {
-      type: String
-    },
-		height: {
-      type: Number
-    },
-		weight: {
-      type: Number
-    },
-		neck_girth: {
-      type: Number
-    },
-		waist_girth: {
-      type: Number
-    },
-		forearm_girth: {
-      type: Number
-    },
-		wrist_girth: {
-      type: Number
-    },
-		hip_girth: {
-      type: Number
-    }
+		type: Object
 	},
 
   diet_settings: {
-    food_preferences: {
-      type: Array
-    },
-		food_excluded: {
-      type: Array
-    },
-		diet_preferences: {
-      type: Array
-    },
-		number_meals: {
-      type: Number
-    },
-		financial_opportunities: {
-      type: Number
-    },
+    type: Object
   },
 
   last_menu: {
