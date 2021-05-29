@@ -59,7 +59,11 @@ app.use(flash())
 app.use(varMiddleware)
 app.use(userMiddleware)
 app.use(bodyParser.json())
+
+
 app.use(cors({credentials: true, origin: ['http://localhost:3000']}))
+
+
 
 app.use('/', homeRoutes)
 app.use('/createDiet', createDietRoutes)
