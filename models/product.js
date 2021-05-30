@@ -5,8 +5,20 @@ const product = new Schema({
         type: String,
         requires: true
     },
-    categories: {
-        type: Array,
+    condition: {
+        type: String,
+        requires: true
+    },
+    src: {
+        type: String,
+        requires: true
+    },
+    image: {
+        type: String,
+        requires: true
+    },
+    category: {
+        type: String,
         required: true
     },
     nutrients: {
