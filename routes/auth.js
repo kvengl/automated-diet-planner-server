@@ -77,7 +77,6 @@ router.post('/register', async (req, res) => {
 router.post('/userLogin', async (req, res) => {
     try {
         const { username, password } = req.body
-
         let candidate = await User.findOne({ "auth.username": username })
         if (!candidate) {
             candidate = await User.findOne({ "auth.email": username })
@@ -86,10 +85,8 @@ router.post('/userLogin', async (req, res) => {
                 return
             }
         }
-
         if (candidate) {
             const areSame = await bcrypt.compare(password, candidate.auth.password)
-
             if (areSame) {
                 req.session.user = candidate
                 req.session.isAuthenticated = true
@@ -153,7 +150,7 @@ router.get('/checkSession/:id', async (req, res) => {
         else
             res.send({ ok: false })
     } catch (e) {
-        console.log(e)
+        //console.log(e)
         res.send({ ok: false })
     }
 })
@@ -167,7 +164,7 @@ router.get('/getUserData/:id', async (req, res) => {
         else
             res.send({ ok: false })
     } catch (e) {
-        // console.log(e)
+        console.log(e)
         res.send({ ok: false })
     }
 })
@@ -176,12 +173,24 @@ router.post('/updateUser/:id', async (req, res) => {
     try {
         const id = req.params.id
         const { user } = req.body
-
         let candidate = await User.findOne({ _id: id })
         if (candidate.auth.password !== user.auth.password) {
             user.auth.password = await bcrypt.hash(user.auth.password, 10)
         }
-
+        if (candidate.auth.username !== user.auth.username) {
+            let findUser = await User.findOne({ "auth.username": user.auth.username })
+            if (findUser) {
+                res.send({ ok: false, error: 'Пользователь с таким именем уже существует' })
+                return
+            }
+        }
+        if (candidate.auth.email !== user.auth.email) {
+            let findUser = await User.findOne({ "auth.email": user.auth.email })
+            if (findUser) {
+                res.send({ ok: false, error: 'Пользователь с таким email уже существует' })
+                return
+            }
+        }
         candidate = await User.findByIdAndUpdate(id, user)
         if (candidate)
             res.send({ ok: true, object: user })
