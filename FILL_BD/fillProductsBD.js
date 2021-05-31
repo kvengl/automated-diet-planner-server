@@ -1,7 +1,7 @@
 
 
 const mongoose = require('mongoose')
-const Product = require('./models/product')
+const Product = require('../models/product')
 const fs = require('fs')
 
 async function start() {
