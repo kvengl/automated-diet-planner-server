@@ -177,7 +177,6 @@ const parseVitamins = async () => {
                     number *= 1000
                 if (metric === 'г')
                     number *= 1000000
-
                 obj = {
                     value: number_native,
                     metric,
@@ -560,7 +559,6 @@ const parseBase = async () => {
         console.log(i)
         const url = products[i].src
         const $ = await getHTML(url)
-
         const calories = await $('.js__msr_cc').eq(2).text()
         const fats = await $('.js__msr_cc').eq(3).text()
         const proteins = await $('.js__msr_cc').eq(4).text()
@@ -569,9 +567,7 @@ const parseBase = async () => {
         const ash = await $('.js__msr_cc').eq(7).text()
         const cholesterol = await $('.js__msr_cc').eq(11).text()
         const transFat = await $('.js__msr_cc').eq(12).text()
-
         const mas = [calories, fats, proteins, carbo, water, ash, cholesterol, transFat]
-
         mas.forEach((val, j) => {
             const value = val.trim().replace(/[\n\t]+/g, " ").replace(/[\s]+/g, "")
             const number_native = parseFloat(value.replace(',', '.'))

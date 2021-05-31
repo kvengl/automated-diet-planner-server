@@ -43,7 +43,6 @@ async function start() {
 }
 start()
 
-
 app.engine('hbs', hbs.engine) // в express регистрируем, что существует движок hbs
 app.set('view engine', 'hbs') // начинаем использовать
 app.set('views', 'views') // указываем папку с html-страницами
@@ -61,10 +60,7 @@ app.use(varMiddleware)
 app.use(userMiddleware)
 app.use(bodyParser.json())
 
-
 app.use(cors({credentials: true, origin: ['http://localhost:3000']}))
-
-
 
 app.use('/', homeRoutes)
 app.use('/createDiet', createDietRoutes)
