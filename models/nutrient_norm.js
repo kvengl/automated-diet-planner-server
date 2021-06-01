@@ -1,6 +1,6 @@
 const { Schema, model } = require('mongoose')
 
-const nutrient_norms = new Schema({
+const nutrient_norm = new Schema({
     russian_name: {
         type: String,
         requires: true
@@ -24,4 +24,4 @@ const nutrient_norms = new Schema({
     }
 })
 
-module.exports = model('Nutrient_norms', nutrient_norms)
+module.exports = model('Nutrient_norm', nutrient_norm)

@@ -43,9 +43,9 @@ async function start() {
 }
 start()
 
-app.engine('hbs', hbs.engine) // в express регистрируем, что существует движок hbs
-app.set('view engine', 'hbs') // начинаем использовать
-app.set('views', 'views') // указываем папку с html-страницами
+app.engine('hbs', hbs.engine)
+app.set('view engine', 'hbs')
+app.set('views', 'views')
 
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.urlencoded({extended: true}))

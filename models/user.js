@@ -1,7 +1,6 @@
-const {Schema, model} = require('mongoose')
+const { Schema, model } = require('mongoose')
 
 const userSchema = new Schema({
-
   auth: {
     username: {
       type: String,
@@ -16,9 +15,16 @@ const userSchema = new Schema({
       required: true
     },
     role: {
-      type: String,
-      required: true,
-      default: 'user'
+      value: {
+        type: String,
+        required: true,
+        default: 'user'
+      },
+      key: {
+        type: Schema.Types.ObjectId,
+        ref: 'User_role',
+        required: true
+      }
     },
     birthday: {
       type: Date,
@@ -26,13 +32,11 @@ const userSchema = new Schema({
     },
   },
   anthropometry: {
-		type: Object
-	},
-
+    type: Object
+  },
   diet_settings: {
     type: Object
   },
-
   last_menu: {
     type: Object
   }

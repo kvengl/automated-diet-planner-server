@@ -1,6 +1,6 @@
 const { Schema, model } = require('mongoose')
 
-const product_categories = new Schema({
+const product_category = new Schema({
     name: {
         type: String,
         requires: true
@@ -11,4 +11,4 @@ const product_categories = new Schema({
     }
 })
 
-module.exports = model('Product_categories', product_categories)
+module.exports = model('Product_category', product_category)

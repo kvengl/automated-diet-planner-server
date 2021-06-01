@@ -25,6 +25,18 @@ const product = new Schema({
         type: Object,
         required: true
     },
+    metrics: [
+        {
+            name: String,
+            metricId: {
+                type: Schema.Types.ObjectId,
+                ref: 'Metric',
+                required: true
+            },
+            value: Number,
+            value_gram: Number
+        }
+    ],
     created: {
         type: Date,
         default: Date.now

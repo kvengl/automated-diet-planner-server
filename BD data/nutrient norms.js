@@ -1,7 +1,7 @@
 
 
 const mongoose = require('mongoose')
-const Nutrient_norms = require('../models/nutrient_norms')
+const Nutrient_norm = require('../models/nutrient_norm')
 
 async function start() {
     try {
@@ -420,7 +420,7 @@ async function start() {
         for (let i = 0; i < mas.length; i++) {
             const val = mas[i]
             const {name, data, russian_name} = val
-            const nutrients_norms = new Nutrient_norms({
+            const nutrients_norms = new Nutrient_norm({
                 russian_name,
                 name,
                 data

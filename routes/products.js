@@ -1,13 +1,13 @@
 const { Router } = require('express')
-const Nutrient_norms = require('../models/nutrient_norms')
+const Nutrient_norm = require('../models/nutrient_norm')
 const Product = require('../models/product')
-const Product_categories = require('../models/product_categories')
+const Product_category = require('../models/product_category')
 const auth = require('../middleware/auth_api')
 const router = Router()
 
 router.get('/getNorms', auth, async (req, res) => {
     try {
-        let norms = await Nutrient_norms.find()
+        const norms = await Nutrient_norm.find()
         res.send({ok: true, message: norms})
     } catch (e) {
         console.log(e)
@@ -38,7 +38,7 @@ router.get('/getProducts', auth, async (req, res) => {
 
 router.get('/getCategories', auth, async (req, res) => {
     try {
-        const categories = await Product_categories.find()
+        const categories = await Product_category.find()
         const obj = categories.map(val => {
             const {name, _id} = val
             return {
@@ -52,7 +52,5 @@ router.get('/getCategories', auth, async (req, res) => {
         res.send({ ok: false })
     }
 })
-
-
 
 module.exports = router

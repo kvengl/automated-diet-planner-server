@@ -1,7 +1,7 @@
 
 
 const mongoose = require('mongoose')
-const Product_categories = require('../models/product_categories')
+const Product_category = require('../models/product_category')
 const Product = require('../models/product')
 
 async function start() {
@@ -17,10 +17,10 @@ async function start() {
             
         })
         mas.forEach(async (el) => {
-            const product_categories = new Product_categories({
+            const product_category = new Product_category({
                 name: el
             })
-            await product_categories.save()
+            await product_category.save()
         }) 
     } catch (e) {
         console.log(e)

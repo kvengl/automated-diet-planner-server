@@ -1,6 +1,8 @@
 const { Router } = require('express')
 const bcrypt = require('bcryptjs')
+const auth = require('../middleware/auth_api')
 const User = require('../models/user')
+const User_role = require('../models/user_role')
 const router = Router()
 
 router.get('/login', async (req, res) => {
@@ -123,10 +125,22 @@ router.post('/userRegister', async (req, res) => {
             res.send({ ok: false, error: 'Пользователь с таким email уже существует' })
             return
         }
+
+        const role = 'user'
+        const findRole = await User_role.findOne({ name: role })
+        
+        let role_key = ''
+        if (findRole)
+            role_key = findRole._id
+        else {
+            res.send({ ok: false, error: 'Ошибка в ключе роли'})
+            return
+        }
+
         const hashPassword = await bcrypt.hash(password, 10)
         const user = new User({
             auth: {
-                username, password: hashPassword, email, birthday
+                username, password: hashPassword, email, birthday, role: {value: role, key: role_key}
             },
             anthropometry: null,
             diet_settings: null,
@@ -155,7 +169,7 @@ router.get('/checkSession/:id', async (req, res) => {
     }
 })
 
-router.get('/getUserData/:id', async (req, res) => {
+router.get('/getUserData/:id', auth, async (req, res) => {
     try {
         const id = req.params.id
         const candidate = await User.findOne({ _id: id })
@@ -169,7 +183,7 @@ router.get('/getUserData/:id', async (req, res) => {
     }
 })
 
-router.post('/updateUser/:id', async (req, res) => {
+router.post('/updateUser/:id', auth, async (req, res) => {
     try {
         const id = req.params.id
         const { user } = req.body
