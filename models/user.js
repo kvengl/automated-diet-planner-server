@@ -37,7 +37,7 @@ const userSchema = new Schema({
   diet_settings: {
     type: Object
   },
-  last_menu: {
+  food_plan: {
     type: Object
   }
 })
