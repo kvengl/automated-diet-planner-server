@@ -68,11 +68,12 @@ router.post('/optimization', auth, async (req, res) => {
         // Формируем матрицу Гессиана
         for (let i = 0; i < nutrient_norms.length; i++) {
             H[i] = []
-            for (let j = 0; j < nutrient_norms.length; j++) {
+            for (let j = 0; j < cards.length; j++) {
                 if (i === j) H[i][j] = nutrient_norms[i]
                 else H[i][j] = 0
             }
         }
+        console.log(H)
         const min_values = []
         const max_values = []
         let relative_value_nutritional_components = []
@@ -146,16 +147,8 @@ router.post('/optimization', auth, async (req, res) => {
             relative_value_nutritional_components.push(nutrients)
         }
         // формируем вектор коэффициентов относительной ценности компонентов
-        const dvec = []
-        let sum = 0
-        for (let i = 0; i < nutrient_norms.length; i++) {
-            for (let j = 0; j < cards.length; j++)
-                sum += relative_value_nutritional_components[j][i]
-            dvec.push(sum)
-            sum = 0
-        }
-
-        const result = numeric.solveQP(H, dvec, min_values, max_values)
+        const dvec = relative_value_nutritional_components.map(val => val.reduce((sum, curr) => sum + curr, 0))
+        const result = numeric.solveQP(H, dvec, [[]], max_values, min_values)
         
         console.log(result)
 
