@@ -559,14 +559,19 @@ const parseBase = async () => {
         console.log(i)
         const url = products[i].src
         const $ = await getHTML(url)
-        const calories = await $('.js__msr_cc').eq(2).text()
-        const fats = await $('.js__msr_cc').eq(3).text()
-        const proteins = await $('.js__msr_cc').eq(4).text()
-        const carbo = await $('.js__msr_cc').eq(5).text()
-        const water = await $('.js__msr_cc').eq(6).text()
-        const ash = await $('.js__msr_cc').eq(7).text()
-        const cholesterol = await $('.js__msr_cc').eq(11).text()
-        const transFat = await $('.js__msr_cc').eq(12).text()
+
+        const test = await $('.js__msr_cc').eq(0).text().includes('кКал')
+
+        const sum = test ? 0 : 2
+
+        const calories = await $('.js__msr_cc').eq(0 + sum).text()
+        const fats = await $('.js__msr_cc').eq(1 + sum).text()
+        const proteins = await $('.js__msr_cc').eq(2 + sum).text()
+        const carbo = await $('.js__msr_cc').eq(3 + sum).text()
+        const water = await $('.js__msr_cc').eq(4 + sum).text()
+        const ash = await $('.js__msr_cc').eq(5 + sum).text()
+        const cholesterol = await $('.js__msr_cc').eq(9 + sum).text()
+        const transFat = await $('.js__msr_cc').eq(10 + sum).text()
         const mas = [calories, fats, proteins, carbo, water, ash, cholesterol, transFat]
         mas.forEach((val, j) => {
             const value = val.trim().replace(/[\n\t]+/g, " ").replace(/[\s]+/g, "")
@@ -577,9 +582,9 @@ const parseBase = async () => {
                 obj = null
             } else {
                 let number = number_native
-                if (metric === 'мг')
+                if (metric.includes('мг'))
                     number *= 1000
-                if (metric === 'г')
+                else if (metric.includes('г'))
                     number *= 1000000
 
                 obj = {
@@ -625,4 +630,4 @@ const parseBase = async () => {
 // parseAmino()
 // parseCalories()
 // parseСarbohydrates()
-// parseBase()
+parseBase()
