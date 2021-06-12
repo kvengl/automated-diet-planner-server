@@ -3,7 +3,7 @@ const { Schema, model } = require('mongoose')
 const product_category = new Schema({
     name: {
         type: String,
-        requires: true
+        required: true
     },
     created: {
         type: Date,

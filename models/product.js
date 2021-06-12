@@ -21,6 +21,11 @@ const product = new Schema({
         type: String,
         required: true
     },
+	categoryId: {
+		type: Schema.Types.ObjectId,
+		ref: 'Product_category',
+		required: true
+	},
     nutrients: {
         type: Object,
         required: true

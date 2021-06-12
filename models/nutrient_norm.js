@@ -3,20 +3,20 @@ const { Schema, model } = require('mongoose')
 const nutrient_norm = new Schema({
     russian_name: {
         type: String,
-        requires: true
+        required: true
     },
     name: {
         type: String,
-        requires: true
+        required: true
     },
     data: {
         value: {
             type: Number,
-            requires: true
+            required: true
         },
         metric: {
             type: String,
-            requires: true
+            required: true
         },
         value_mcg: {
             type: Number,

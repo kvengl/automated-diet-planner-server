@@ -10,7 +10,7 @@ const appeal = new Schema({
         requires: true
     },
     message: {
-        type: Number,
+        type: String,
         requires: true
     },
     checked: {

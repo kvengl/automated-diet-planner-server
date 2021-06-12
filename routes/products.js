@@ -6,8 +6,7 @@ const auth = require('../middleware/auth_api')
 const router = Router()
 const qp = require('quadprog-js')
 const fs = require('fs')
-
-const numeric = require('numeric')
+const { diag } = require('numeric')
 
 router.get('/getNorms', auth, async (req, res) => {
     try {
@@ -59,32 +58,23 @@ router.get('/getCategories', auth, async (req, res) => {
 
 router.post('/optimization', auth, async (req, res) => {
     try {
-        const { cards } = req.body
+        const { cards, calories, volume } = req.body
         let nutrient_norms = await Nutrient_norm.find()
         nutrient_norms.shift()
-        nutrient_norms = nutrient_norms.map(val => val.data.value_mcg)
-
-        let H = []
-        // Формируем матрицу Гессиана
-        for (let i = 0; i < nutrient_norms.length; i++) {
-            H[i] = []
-            for (let j = 0; j < cards.length; j++) {
-                if (i === j) H[i][j] = nutrient_norms[i]
-                else H[i][j] = 0
-            }
-        }
-        console.log(H)
-        const min_values = []
+        nutrient_norms = nutrient_norms.map(val => val.data.value_mcg / 1000) // приведём к миллиграммам
+        let min_values = []
         const max_values = []
         let relative_value_nutritional_components = []
-        // Формируем матрицу относительной ценности j-компонента в i-ом
+        // Формируем матрицу относительной ценности j-компонента в i-ом продукте
+        const ccal_norm = []
         for (let i = 0; i < cards.length; i++) {
             const product_name = cards[i].product_name
             min_values.push(cards[i].min_value)
             max_values.push(cards[i].max_value)
             const product = await Product.findOne({ name: product_name })
-
+            
             const base = product.nutrients.base
+            ccal_norm.push(base.calories.value / 100)
             const proteins = base.proteins ? base.proteins.value_mcg / 100 : 0
             const fats = base.fats ? base.fats.value_mcg / 100 : 0
             const carbohydrates = base.carbohydrates ? base.carbohydrates.value_mcg / 100 : 0
@@ -143,17 +133,114 @@ router.post('/optimization', auth, async (req, res) => {
             const proline = amino.proline ? amino.proline.value_mcg / 100 : 0
             const serine = amino.serine ? amino.serine.value_mcg / 100 : 0
 
-            const nutrients = [proteins, fats, carbohydrates, calcium, iron, magnesium, phosphorus, potassium, sodium, zinc, copper, manganese, selenium, fluorine, A, beta_Carotene, alpha_Carotene, D, D2, D3, E, K, C, B1, B2, B3, B4, B5, B6, B9, B12, tryptophan, threonine, isoleucine, leucine, lysine, methionine, cystine, phenylalanine, tyrosine, valine, arginine, histidine, alanine, aspartic_acid, glutamic_acid, glycine, proline, serine]
+            const nutrients = [proteins, fats, carbohydrates, calcium, iron, magnesium, phosphorus, potassium, sodium, zinc, copper, manganese, selenium, fluorine, A, beta_Carotene, alpha_Carotene, D, D2, D3, E, K, C, B1, B2, B3, B4, B5, B6, B9, B12, tryptophan, threonine, isoleucine, leucine, lysine, methionine, cystine, phenylalanine, tyrosine, valine, arginine, histidine, alanine, aspartic_acid, glutamic_acid, glycine, proline, serine].
+            map(val => val / 1000) // приведём к миллиграммам
+
             relative_value_nutritional_components.push(nutrients)
         }
-        // формируем вектор коэффициентов относительной ценности компонентов
-        const dvec = relative_value_nutritional_components.map(val => val.reduce((sum, curr) => sum + curr, 0))
-        const result = numeric.solveQP(H, dvec, [[]], max_values, min_values)
+        // Формируем матрицу Гессе
+        let H = Array(cards.length).fill().map(()=>Array(cards.length).fill())
+        // Формируем вектор диагонали
+        const diag = []
+        let sum = 0
+        for (let i = 0; i < cards.length; i++) {
+            for (let j = 0; j < nutrient_norms.length; j++)
+                sum += relative_value_nutritional_components[i][j] ** 2
+            diag.push(sum)
+            sum = 0
+        }
+        // Заполняем матрицу Гессе
+        for (let i = 0; i < cards.length; i++) {
+            for (let j = 0; j < cards.length; j++) {
+                if (i === j) H[i][j] = diag[i]
+                else if (i < j) {
+                    sum = 0
+                    for (let k = 0; k < nutrient_norms.length; k++)
+                        sum += relative_value_nutritional_components[i][k] * relative_value_nutritional_components[j][k]
+                    H[i][j] = sum
+                    H[j][i] = sum
+                }
+            }
+        }
+
+        const f = []
+        for (let i = 0; i < cards.length; i++) {
+            sum = 0
+            for (let j = 0; j < nutrient_norms.length; j++)
+                sum += relative_value_nutritional_components[i][j] * nutrient_norms[j] * 2
+            f.push(-sum)
+        }
+
+        const A = cards.map(() => 1)
+        const b = volume
+        const Aeq = ccal_norm
+        const beq = calories
+
+        const lb = []
+        const ub = []
+        for (let i = 0; i < cards.length; i++) {
+            const min = []
+            const max = []
+            for (let j = 0; j < cards.length; j++) {
+                if (i === j) {
+                    min.push(-1)
+                    max.push(1)
+                } else {
+                    min.push(0)
+                    max.push(0)
+                }
+            }
+            lb.push(min)
+            ub.push(max)
+        }
+        min_values = min_values.map(val => -val)
+        const result = qp(H, f, [Aeq, A, ...lb, ...ub], [beq, b, ...min_values, ...max_values]).solution.map(val => +val.toFixed(2))
         
-        console.log(result)
+        // статистика (нутриенты без калорий)
+        const statistic = []
+        for (let i = 0; i < nutrient_norms.length; i++) {
+            sum = 0
+            for (let j = 0; j < cards.length; j++)
+                sum += result[j] * relative_value_nutritional_components[j][i]
+            statistic.push(+sum.toFixed(2))    
+        }
+        // добавим в начало калории
+        sum = 0
+        for (let i = 0; i < cards.length; i++)
+            sum += result[i] * ccal_norm[i]
+        statistic.unshift(+sum.toFixed(2))
+        
+        // приведём к нормальным метрикам
+        const nutrients = await Nutrient_norm.find()
+        for (let i = 0; i < statistic.length; i++) {
+            if (nutrients[i].data.metric === 'г')
+                statistic[i] = +(statistic[i] / 1000).toFixed(2)
+            if (nutrients[i].data.metric === 'мкг')
+                statistic[i] = +(statistic[i] * 1000).toFixed(2) 
+        }
 
-        res.send({ ok: false })
-
+        const tableData = []
+        // сформируем данные для таблицы на клиенте
+        for (let i = 0; i < statistic.length; i++) {
+            if (i === 0) {
+                tableData.push({
+                    key: i,
+                    name: nutrients[i].russian_name,
+                    fact: statistic[i] + ' ' + nutrients[i].data.metric,
+                    recommend: calories + ' ккал',
+                    deviation: +Math.abs(statistic[i] - calories).toFixed(2)
+                })
+            } else {
+                tableData.push({
+                    key: i,
+                    name: nutrients[i].russian_name,
+                    fact: statistic[i] + ' ' + nutrients[i].data.metric,
+                    recommend: nutrients[i].data.value + ' ' + nutrients[i].data.metric,
+                    deviation: +Math.abs(statistic[i] - nutrients[i].data.value).toFixed(2)
+                })
+            }
+        }
+        res.send({ ok: true, message: result, statistic: tableData })
 
     } catch (e) {
         console.log(e)

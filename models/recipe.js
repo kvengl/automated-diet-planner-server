@@ -3,23 +3,23 @@ const { Schema, model } = require('mongoose')
 const recipe = new Schema({
     name: {
         type: String,
-        requires: true
+        required: true
     },
     ingredients_price: {
         type: Number,
-        requires: true
+        required: true
     },
     price: {
         type: Number,
-        requires: true
+        required: true
     },
     src: {
         type: String,
-        requires: true
+        required: true
     },
     image: {
         type: String,
-        requires: true
+        required: true
     },
     cooking_time: {
         type: Number
